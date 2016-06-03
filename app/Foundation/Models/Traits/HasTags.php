@@ -20,4 +20,30 @@ trait HasTags
             return $tag->hasType($type);
         });
     }
+
+    public static function getAllOnlineGroupedByTagCategory(TagType $tagType): Collection
+    {
+        $tags = Tag::getWithType($tagType);
+
+        return static::allOnline()
+            ->groupBy(function (Model $model) use ($tagType) {
+                $firstTag = $model->tagsWithType($tagType)->first();
+
+                if (!$firstTag) {
+                    return 0;
+                }
+
+                return $firstTag->id;
+            })
+            ->map(function ($tagIdsWithModels, int $tagId) use ($tags) {
+                return [
+                    'tag' => $tags->get($tagId),
+                    'models' => collect($tagIdsWithModels)->values(),
+                ];
+            })
+            ->sortBy(function (array $tagsAndModels) {
+                return $tagsAndModels['tag']->order_column;
+            })
+            ->values();
+    }
 }

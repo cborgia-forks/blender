@@ -6,6 +6,7 @@ use App\Foundation\Models\Traits\Draftable;
 use App\Foundation\Models\Traits\Presentable;
 use App\Foundation\Models\Traits\HasMedia as HasMediaTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\HasMedia\Interfaces\HasMediaConversions;
 use Spatie\ModelCleanup\GetsCleanedUp;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +18,17 @@ abstract class ModuleModel extends Model implements HasMediaConversions, GetsCle
     use Draftable, Presentable, HasMediaTrait, HasTranslations;
 
     protected $guarded = ['id'];
+
+    /** @return static */
+    public static function findOnline($id)
+    {
+        return static::online()->find('id', $id);
+    }
+
+    public static function allOnline(): Collection
+    {
+        return static::online()->get();
+    }
 
     public function registerMediaConversions()
     {
